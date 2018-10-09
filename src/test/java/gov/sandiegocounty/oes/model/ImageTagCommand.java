@@ -21,14 +21,14 @@ import gov.sandiegocounty.util.HttpURLConnectionRunner;
  * @author David Parker (dfparker@aemintegrators.com)
  *
  */
-public class HeadTagCommand extends AbstractTagCommand implements ITagCommand {
+public class ImageTagCommand extends AbstractTagCommand implements ITagCommand {
 
 
-	private static final Logger log = LoggerFactory.getLogger(HeadTagCommand.class);
+	private static final Logger log = LoggerFactory.getLogger(ImageTagCommand.class);
 
 	static int cnt = -1;
 
-	public HeadTagCommand() {
+	public ImageTagCommand() {
 	}//div.page-copy > table.table
 
 
@@ -44,10 +44,8 @@ public class HeadTagCommand extends AbstractTagCommand implements ITagCommand {
 
 		try {
 
-			final String COUNTER = HeadTagCommand.cnt < 0 ? "" : Integer.toString(HeadTagCommand.cnt++);//Integer.toString(node_seed_idx)
-System.err.printf( " HeadTagCommand :: cnt %s \n COUNTR %s", ParagraphTagCommand.cnt, COUNTER );
-
-
+			final String COUNTER = ImageTagCommand.cnt < 0 ? "" : Integer.toString(node_seed_idx);
+			ImageTagCommand.cnt++;
 /*
  * Non-page header / only a page element
  */

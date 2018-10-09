@@ -90,7 +90,7 @@ public class MultipartUtility {
 		writer.append("Content-Disposition: form-data; name=\"" + name + "\"").append(LINE_FEED);
 		writer.append("Content-Type: text/plain; charset=" + charset).append(LINE_FEED);
 		writer.append(LINE_FEED);
-		writer.append(value).append(LINE_FEED);
+		writer.append(value);//.append(LINE_FEED);
 log.debug( " MultipartUtility.addFormField :: name {},  value {}\n\n", name, value );
 		writer.flush();
 	}
