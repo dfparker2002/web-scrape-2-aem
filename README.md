@@ -12,7 +12,7 @@ CONTENTPATH="content/oesemergency/${PAGES[$ix]}"
     printf "%s" "$CONTENTPATH"
 curl -u admin:admin \
  -F "jcr:primaryType=cq:Page" \
- "http://192.168.200.87:4502/$CONTENTPATH"
+ "http://localhost:4502/$CONTENTPATH"
 
 curl -u admin:admin "http://localhost:4502/$CONTENTPATH" \
  -F "jcr:content/jcr:primaryType=cq:PageContent" \
