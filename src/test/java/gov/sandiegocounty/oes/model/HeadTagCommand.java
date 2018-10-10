@@ -3,19 +3,9 @@
  */
 package gov.sandiegocounty.oes.model;
 
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import gov.sandiegocounty.util.HttpURLConnectionRunner;
-
 
 /**
  * @author David Parker (dfparker@aemintegrators.com)
@@ -26,7 +16,7 @@ public class HeadTagCommand extends AbstractTagCommand implements ITagCommand {
 
 	private static final Logger log = LoggerFactory.getLogger(HeadTagCommand.class);
 
-	static int cnt = -1;
+	static int cnt = ParagraphTagCommand.cnt;
 
 	public HeadTagCommand() {
 	}//div.page-copy > table.table
@@ -39,19 +29,20 @@ public class HeadTagCommand extends AbstractTagCommand implements ITagCommand {
 	 * Usually page title are decorated with class=.art-PostHeader.. but not always
 	 * Other kinds of H* are page elements and not page headers
 	 */
-	static public void cmd(final String PATH, Element x, int node_seed_idx ) {
+	static public void cmd(final String PATH, Element x, int node_seed_idx ) throws Exception {
 
 
-		try {
-
-			final String COUNTER = HeadTagCommand.cnt < 0 ? "" : Integer.toString(HeadTagCommand.cnt++);//Integer.toString(node_seed_idx)
+		final String COUNTER = HeadTagCommand.cnt < 0 ? "" : Integer.toString(HeadTagCommand.cnt );//Integer.toString(node_seed_idx)
 System.err.printf( " HeadTagCommand :: cnt %s \n COUNTR %s", ParagraphTagCommand.cnt, COUNTER );
 
+/*
+ * Assign page title
+ */
 
 /*
  * Non-page header / only a page element
  */
-			if (x.getElementsByAttributeValueMatching("class", "art-PostHeader").isEmpty()) {  // page data
+		if (x.getElementsByAttributeValueMatching("class", "art-PostHeader").isEmpty()) {  // page data
 /* DO NORMAL TEXT PROCESSING
 
  * 1 create parsys; E.g.,http://192.168.200.87:4502/content/oes/en-us/test/jcr:content/oes-content/title
@@ -75,7 +66,7 @@ System.out.printf( " HeadTagCommand :: cmd  :: doStructureViaREST \n"
 	+ "- ATTR_PATH %s\n"
 	+ "- data %s\n", 
 		PATH
-		, CONTENT_TILE_SEED.concat(TEXT)
+		, CONTENT_TILE_SEED.concat("HEADER")
 			.concat(COUNTER).concat("/")
 			.concat(PROP_BASE_TYPE)
 		, PROP_TEXT
@@ -83,7 +74,7 @@ System.out.printf( " HeadTagCommand :: cmd  :: doStructureViaREST \n"
 
 			doStructureViaREST(
 				PATH
-				,CONTENT_TILE_SEED.concat(TEXT)
+				,CONTENT_TILE_SEED.concat("HEADER")
 					.concat(COUNTER).concat("/")
 					.concat(PROP_BASE_TYPE)
 				, PROP_TEXT
@@ -94,7 +85,7 @@ System.out.printf( " HeadTagCommand :: cmd  :: doStructureViaREST \n"
  */
 			doStructureViaREST(
 				PATH
-				,CONTENT_TILE_SEED.concat(TEXT)
+				,CONTENT_TILE_SEED.concat("HEADER")
 					.concat(COUNTER).concat("/") 		// jcr:content/oes-content/text#/
 					.concat(PROP_TEXTISRICH)			// "textIsRich"
 				, "true"
@@ -109,7 +100,7 @@ System.out.printf( " HeadTagCommand :: cmd  :: doStructureViaREST \n"
 			doContentViaREST(
 				PATH
 				, CONTENT_TILE_SEED
-					.concat("text")
+					.concat("HEADER")
 					.concat(COUNTER).concat("/")// jcr:content/oes-content/text#/
 					.concat( TEXT )				// jcr:content/oes-content/title/text=<CONTENT>
 				, x.selectFirst("h1,h2,h3,h4")	// CONTENT
@@ -119,7 +110,7 @@ System.out.printf( " HeadTagCommand :: cmd  :: doStructureViaREST \n"
 // / "NORMAL" h* node
 
 
-			} else { // page title
+		} else { // page title
 
 // page title /////............................
 //doContentViaREST(
@@ -131,11 +122,11 @@ System.out.printf( " HeadTagCommand :: cmd  :: doStructureViaREST \n"
 //	, x.selectFirst("h1,h2,h3,h4")	// CONTENT
 //);
 
-doStructureViaREST(
-		PATH
-		,PAGE_CONTENT_SEED.concat(TITLE)
-	, x.selectFirst("h1,h2,h3,h4").text()
-);
+			doStructureViaREST(
+				PATH
+				,PAGE_CONTENT_SEED.concat(TITLE)
+				, x.selectFirst("h1,h2,h3,h4").text()
+			);
 
 ///////////////////............................
 /*
@@ -150,7 +141,7 @@ System.out.println( " 2 HeadTagCommand :: HeadTagCommand :: cmd \n-TEST DATA " +
 				PATH
 				, CONTENT_TILE_SEED.concat("title/")	// jcr:content/oes-content/title/
 				.concat(PROP_BASE_TYPE)					// sling:resourceType
-			, PROP_OES_TITLE 							// oesshared/components/content/title  
+				, PROP_OES_TITLE 							// oesshared/components/content/title  
 			);
 
 System.err.printf( " HeadTagCommand :: cmd PATH FILE \n%s\nattr path %s,\ncnt %d\n"
@@ -174,12 +165,8 @@ log.debug( " HeadTagCommand :: HeadTagCommand :: cmd (header version) : elem htm
 				, x.selectFirst("h1,h2,h3,h4")	// CONTENT
 			);
 
-			}// end if check for page data
+		}// end if check for page data
 
-		} catch (Exception e1) {
-
-			e1.printStackTrace();
-		}
 	}
 
 

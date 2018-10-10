@@ -124,14 +124,14 @@ public class TwitterColumnTagCommand extends AbstractTagCommand implements ITagC
  * Notes
  * 	Assume element passed into logic is div.col-md-6
  */
-public 	static void cmd( final String PATH, Element elem, int elem_idx ) {
+public 	static void cmd( final String PATH, Element elem, int elem_idx ) throws Exception {
 
 /*
  * map div.oes-box > h3.oes-box-title >
  * div.map-instructions
  */
 
-		try {
+//		try {
 /*
  * reject non columnar data
  */
@@ -801,10 +801,10 @@ System.out.printf( "\n====\n $$ TwitterColumnTagCommand :: cmd \n- CONTENT_PATH 
 
 ////////////////////////////
 
-	    } catch (Exception e1) {
-
-	      e1.printStackTrace();
-	    }
+//	    } catch (Exception e1) {
+//
+//	      e1.printStackTrace();
+//	    }
 
 	  }
 

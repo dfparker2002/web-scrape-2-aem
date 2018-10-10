@@ -4,8 +4,12 @@
 package gov.sandiegocounty.util;
 
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,6 +18,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -26,6 +31,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import gov.sandiegocounty.oes.model.PageObj;
 
@@ -41,6 +48,9 @@ import gov.sandiegocounty.oes.model.PageObj;
  */
 public class JSoupParseOES {
 
+	
+	private static final Logger log = LoggerFactory.getLogger(JSoupParseOES.class);
+
 //	final static String OES_DATA_SRC = "C:\\xampp\\htdocs\\www.sdcountyemergency.com";
 	final static String OES_DATA_SRC = "C:\\Users\\User\\workspace\\oesshared\\website\\www.sdcountyemergency.com";
 	static int elem_cnt = 0;
@@ -54,8 +64,14 @@ public class JSoupParseOES {
  * process elements, remove from top of stack to avoid nested, duplicated elems 
  * 
  */
+		Path x = null;
+		try(FileWriter fw = new FileWriter("processing-errs.txt", true);
+			    BufferedWriter bw = new BufferedWriter(fw);
+			    PrintWriter out = new PrintWriter(bw)
+			) { // https://stackoverflow.com/questions/30307382/how-to-append-text-to-file-in-java-8-using-specified-charset#30307562
+			// https://stackoverflow.com/questions/1625234/how-to-append-text-to-an-existing-file-in-java
+			//https://stackoverflow.com/questions/13777336/how-to-append-an-exceptions-stacktrace-into-a-file-in-java
 
-		try {
 
 			Path path = Paths.get(OES_DATA_SRC);
 			final List<Path> files = new ArrayList<>();
@@ -76,29 +92,32 @@ public class JSoupParseOES {
 
 						}
 					});
-//files.forEach(x-> {
-//// LIST AVAIL FILES
-//	System.out.printf( " \nJSoupParseOES :: main %d %s", elem_cnt++, x.toString() 
-//	);
-//}
-//);
 
+
+			/////////////////////
 /*
- * test
+ * Process ALL Pages
  */
-//			int page_idx = 284; // home/index
-			int page_idx = 3; // donations/index
-//			int page_idx = 138; // about/index
-			ParseFile p = new ParseFile();
+			final ParseFile p = new ParseFile();
 
-System.out.println( " JSoupParseOES :: main FILE UT " + files.get(page_idx).toString());
-Element e = p.doParseFile(files.get(page_idx));//284
+			int cnt = 0;
+			for (Iterator<Path> iterator = files.iterator(); iterator.hasNext();) {
+				x = iterator.next();
+
+if( 
+	!x.endsWith("es-us\\index.html")
+	&& !x.endsWith("en-us\\index.html")
+//	&& x.endsWith("donations\\index.html") // testing
+//	&& x.endsWith("active-shooter-at-san-diego-rockn-roll-marathon-060318-1325\\index.html") // testing
+) {
+//			files.forEach(x-> {
+
+//				try{ 
+					Element e = p.doParseFile(x);
 
 // TEST various pages explicitly 
 ////System.out.println( " JSoupParseOES :: main " + files.get(1).toString());
 ////e = p.doParseFile(files.get(1));//284
-
-			p = null;
 
 //////////////////
 
@@ -112,17 +131,124 @@ Element e = p.doParseFile(files.get(page_idx));//284
  * 4 -----> invoke HttpURLConnectionRunner(title element, file/node path, internal_props_path )
  */
 
-		PageObj page = new PageObj();
-e.attributes().asList().stream().map(Attribute::getValue).collect(Collectors.toList());
+			PageObj page = new PageObj();
+			if( null != e 
+				&& null != e.getAllElements() 
+//				&& !e.attributes().asList().isEmpty()
+			) {
+
+//				e.attributes().asList().stream()
+//				.filter( o -> o != null )
+//				.map(Attribute::getValue).collect(Collectors.toList() );
+//			}
+//System.out.println( " e " + e.getAllElements() );
+System.out.printf( " <<< "
+	+ "x.toFile() %s"
+	+ ", e.getAllElements().size = %d "
+	+ ", cnt = %d\n"
+	, x.toFile().getPath()
+	, e.getAllElements().size()
+	, cnt
+);
+
 
 			page.processPage(
-				files.get(page_idx).toFile(), e.getAllElements()
+				x.toFile(), e.getAllElements()
 			);
 
+//			} catch (IOException e1) {
+//
+//
+//} catch (IOException e) {
+//    //exception handling left as an exercise for the reader
+//}
+//	Files.write(Paths.get("processing-errs.txt"), x.toAbsolutePath().concat(" :: ").concat( e1.getMessage() ).getBytes() );
 
-		page = null;
-		p = null;
-		e = null;
+//} catch (IOException e2) {
+//
+//	e2.printStackTrace();
+//}
+//
+//				e1.printStackTrace();
+//			}
+
+//});// end page loop
+				}// end if null elements check
+				}// end if home check
+cnt++;
+			} // end page loop
+
+			} catch (IOException e) {
+
+			    try(Writer w = new FileWriter( "processing-errs.txt", true)) {
+
+
+Files.write( Paths.get("processing-errs.txt"), x.toFile().getPath().concat(" :: ").concat( e.getMessage() ).getBytes() );
+//	x.toAbsolutePath().concat(" :: ").concat( 
+//	e.getMessage().getBytes();
+e.printStackTrace(new PrintWriter(new BufferedWriter(w)));
+log.error( " :: path {} : err {}", x.toFile().getPath(), e.getMessage() );
+
+			    } catch (IOException e1) {
+
+					e1.printStackTrace();
+				}
+
+				e.printStackTrace();
+			}
+			//// end process all pages ///////////
+
+
+		
+/////////////////////////////////
+//files.forEach(x-> {
+//// LIST AVAIL FILES
+//	System.out.printf( " \nJSoupParseOES :: main %d %s", elem_cnt++, x.toString() 
+//	);
+//}
+//);
+
+//			/////////////////////
+///*
+// * test one page
+// */
+////			int page_idx = 284; // home/index
+//			int page_idx = 3; // donations/index
+////			int page_idx = 138; // about/index
+//			ParseFile p = new ParseFile();
+//
+//System.out.println( " JSoupParseOES :: main FILE UT " + files.get(page_idx).toString());
+//Element e = p.doParseFile(files.get(page_idx));
+//
+//// TEST various pages explicitly 
+//////System.out.println( " JSoupParseOES :: main " + files.get(1).toString());
+//////e = p.doParseFile(files.get(1));//284
+//
+//			p = null;
+//
+////////////////////
+//
+////////////////////
+///*
+// * TEST H*
+// * 0 Call JSoupParseOES(file)] 
+// * 1 -> invoke doParseFile
+// * 2 --> parse content @ page center
+// * 3 ---> invoke PageObj(title element)
+// * 4 -----> invoke HttpURLConnectionRunner(title element, file/node path, internal_props_path )
+// */
+//
+//		PageObj page = new PageObj();
+//e.attributes().asList().stream().map(Attribute::getValue).collect(Collectors.toList());
+//
+//			page.processPage(
+//				files.get(page_idx).toFile(), e.getAllElements()
+//			);
+//
+//
+//		page = null;
+//		p = null;
+//		e = null;
 
 /*
  * 3
@@ -134,10 +260,6 @@ e.attributes().asList().stream().map(Attribute::getValue).collect(Collectors.toL
  */
 // PageObj -> HttpURLConnectionRunner work ...
 
-		} catch (IOException e) {
-
-			e.printStackTrace();
-		}
 
 	}
 
@@ -186,7 +308,9 @@ e.attributes().asList().stream().map(Attribute::getValue).collect(Collectors.toL
 			if( null != test && test.size() > 0 ) {
 				content.select("div.xrm-attribute.no-value").remove();
 			}
+
 System.err.println( "clean results");
+//System.err.println( "content " + content.selectFirst("h1,h2,h3,h4").text() );
 if( misc != null && !misc.getAllElements().isEmpty() ) {
 	content = content.insertChildren(0, misc);
 }

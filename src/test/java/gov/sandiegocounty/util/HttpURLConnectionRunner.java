@@ -77,23 +77,25 @@ System.out.printf( "\n1 HttpURLConnectionRunner :: execPost \n"
  * Open URL connection
  */
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
+		synchronized (con) {
 
 /* 
  * This is to add file content
  */
-		MultipartUtility multipart = new MultipartUtility(
-			obj.toString(),
-			StandardCharsets.UTF_8.toString()
-		);
+			MultipartUtility multipart = new MultipartUtility(
+				obj.toString(),
+				StandardCharsets.ISO_8859_1.toString()
+//				StandardCharsets.UTF_8.toString()
+			);
 //System.err.println( e.html().substring(0, 25));
-		multipart.addFormField( tgt_internal_page_path, e.outerHtml() );
+			multipart.addFormField( tgt_internal_page_path, e.outerHtml() );
 
 // Send post request
-		List<String> response = multipart.finish();
+			List<String> response = multipart.finish();
+log.debug( " HttpURLConnectionRunner :: execPost \n{}", String.join("\n** ", response));
+		}
 ///////////////
 
-log.debug( " HttpURLConnectionRunner :: execPost \n{}", String.join("\n** ", response));
 	}
 
 /////////////////
@@ -133,7 +135,8 @@ System.err.println( " HttpURLConnectionRunner :: execPostStructure TARGET NODE: 
  * Open URL connection
  */
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-
+		synchronized (con) {
+	
 ///////////////
 /// * This is to add file content */
 		MultipartUtility multipart = new MultipartUtility( 
@@ -147,6 +150,7 @@ System.err.println( " HttpURLConnectionRunner :: execPostStructure TARGET NODE: 
 //System.out.println( " HttpURLConnectionRunner :: execPostStructure " + 
 log.debug( " HttpURLConnectionRunner :: execPost \n{}", 
 		String.join("\n** ", response));
+		}
 	}
 
 /////////////////

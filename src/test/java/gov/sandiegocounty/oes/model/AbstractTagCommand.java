@@ -9,6 +9,8 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
 
+import com.day.cq.commons.jcr.JcrConstants;
+
 import gov.sandiegocounty.util.HttpURLConnectionRunner;
 
 /**
@@ -18,8 +20,8 @@ import gov.sandiegocounty.util.HttpURLConnectionRunner;
 public class AbstractTagCommand {
 
 	
-	final static String CONTENT_TILE_SEED = "jcr:content/oes-content/";
-	final static String PAGE_CONTENT_SEED = "jcr:content/";
+	final static String PAGE_CONTENT_SEED = JcrConstants.JCR_CONTENT.concat( "/");
+	final static String CONTENT_TILE_SEED = PAGE_CONTENT_SEED.concat( "oes-content/");
 
 	final static Map<String,String> COMPONENT_LIB = new HashMap<>();
 	final static String MAP = "map";; 			// increment
@@ -27,7 +29,7 @@ public class AbstractTagCommand {
 	final static String TEXT = "text";	 		// increment
 	final static String COLUMN = "column_flex"; // increment
 	final static String TITLE = "jcr:title";	// increment
-	final static String VIDEO = "table"; 		// increment
+	final static String VIDEO = "video"; 		// increment
 //	private static final String FLEX_COL_COUNT = null;
 
 	final static String PROP_BASE_TYPE = 	"sling:resourceType";
@@ -37,9 +39,9 @@ public class AbstractTagCommand {
 
 	final static String PROP_TEXT = 		"foundation/components/text";
 	final static String PROP_TABLE = 		"foundation/components/table";
-	final static String PROP_VIDEO = 		"foundation/components/video";
+	final static String PROP_VIDEO = 		"oesshared/components/content/youtube";
 	final static String PROP_OES_TITLE =	"foundation/components/title";
-	final static String PROP_COLUMN = 		"oesshared/components/content/column_flex";
+	final static String PROP_COLUMN = 		"oesshared/components/content/column-flex";
 	final static String PROP_PARSYS = 		"foundation/components/parsys";
 	final static String PROP_IPARSYS = 		"foundation/components/iparsys";
 

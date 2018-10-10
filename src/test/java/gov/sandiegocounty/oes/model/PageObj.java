@@ -5,16 +5,24 @@ package gov.sandiegocounty.oes.model;
 
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Element;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.day.cq.commons.jcr.JcrConstants;
+
+import gov.sandiegocounty.util.HttpURLConnectionRunner;
 
 
 /**
@@ -63,7 +71,7 @@ public class PageObj {
 	final static String TEXT = "text";
 	final static String TEXTISRICH = "textIsRich";
 
-	final static String CONTENT_TILE_SEED = "jcr:content/oes-content/";
+	final static String CONTENT_TILE_SEED = JcrConstants.JCR_CONTENT.concat( "/oes-content/" );
 /*
  * node counter / uniquifier
  */
@@ -82,7 +90,7 @@ public class PageObj {
 	 * @param e
 	 * @return
 	 */
-	static public String processPage(File file, org.jsoup.select.Elements e
+	static public /*String*/void processPage(File file, org.jsoup.select.Elements e
 //		, int elem_count
 	) {
 
@@ -107,15 +115,19 @@ public class PageObj {
 			} 
 		);
 
+		final String file_parent = file.getParentFile().getName() ; 
+//C:\Users\User\workspace\oesshared\website\www.sdcountyemergency.com\es-us\index.html
+		switch (file_parent) { // process page contexts
 
-		switch (file.getParent()) { // process page contexts
-		case "www.sdcountyemergency.com":
-		case "en-us": // en home
-		case "es-us": // es home
+
+			case "www.sdcountyemergency.com":
+			case "en-us": // en home
+			case "es-us": // es home
 // homes
 
+
 			result = "home";
-System.out.println(" \nPageObj :: processPage HOME");
+System.out.println(" \nPageObj :: IGNORE Page HOME");
 
 			break;
 
@@ -125,12 +137,27 @@ System.out.println(" \nPageObj :: processPage HOME");
 			if (e.size() > 0) { // content 9-col
 
 				try {
+
+//System.err.printf( "\n\n>>>> 1 file.getParent %s - %s\n", file.getParent(), file.getParentFile().getName() );
+					String STR_TITLE = "Incident";
+					if( null != e.select( "h1,h2,h3,h4").first() ) {
+
+						STR_TITLE = StringUtils.chomp( e.select( "h1,h2,h3,h4").first().text() );
+					}
+					HttpURLConnectionRunner.execPostStructure(
+						PATH          					// /content/oes/en-us/test
+						,JcrConstants.JCR_CONTENT
+							.concat("/").concat( TITLE)	// jcr:content/oes-content/title
+						, STR_TITLE	// <title>
+					);
+
 /*
  * monitor tag precedence  */
 					PageObj.last_tag = ""; 
 
 					e.forEach(x -> {
-
+						try {
+ 
 String attrs = String.join(".",  x.attributes().asList().stream().map(Attribute::getValue).collect(Collectors.toList()) );
 //System.out.printf( "\n >> tag %s.%s", x.tagName(), attrs  );
 
@@ -142,25 +169,31 @@ String attrs = String.join(".",  x.attributes().asList().stream().map(Attribute:
 						case "h4":
 
 
-							if( x.hasParent() && x.parent().is("div.oes-box") ) {
+							if( !x.select("iframe").isEmpty() ) {
+/*
+ * avoid embedded content
+ */
+							} else if( x.hasParent() && x.parent().is("div.oes-box") ) {
 /*
  * belay column/headers
  * div.oes-box > h3.oes-box-title
  * avoid titles in maps, tables & columns
  */
 
-//							} else if( null == x. first().tag() ) {
-//
-///*
-// * avoid embedded content
-// */
-//							} else{
+							} else {
 
-								HeadTagCommand.cmd(PATH, x, HeadTagCommand.cnt);
+								HeadTagCommand.cmd(PATH, x, HeadTagCommand.cnt++);
+
 							}
 
 							break;
 
+/*						case "hr":
+
+							HorizRuleTagCommand.cmd(PATH, x, HorizRuleTagCommand.cnt++);
+
+							break;
+*/
 						case "iframe":
 
 /*
@@ -205,6 +238,12 @@ String attrs = String.join(".",  x.attributes().asList().stream().map(Attribute:
  *  		b) div.oes-box > ... stuff ... div#map-filter .... stuff.... div ...map stuff
  *  			azure maps
  *  - columns
+ *  	!div.col-md-8 [
+ *  		div.col-md-3
+ *  		div.col-md-4
+ *  		div.col-md-6
+ *  		div.col-md-8
+ *  	]
  *  - twitter
  *  - table
  *  	div.oes-box > h3.oes-box-title > table.table.table-striped.news-list
@@ -217,6 +256,17 @@ String attrs = String.join(".",  x.attributes().asList().stream().map(Attribute:
  *  	<iframe width="560" height="315" allowfullscreen="allowfullscreen" allow="encrypted-media" gesture="media" frameborder="0" src="https://www.youtube.com/embed/12cNBNKIXv8?rel=0&amp;showinfo=0"></iframe>
  *  
  */
+							if(	x.hasClass("col-md-3")
+								|| x.hasClass("col-md-4")
+								|| x.hasClass("col-md-6")
+								|| x.hasClass("col-md-8")
+								) {// columns
+
+								ColumnTagCommand.cmd(PATH, x, ColumnTagCommand.cnt++ );
+								
+							}// end columns
+
+
 							if(
 								!x.select("h3.oes-box-title:contains(Twitter)").isEmpty()
 								&& x.hasClass("col-md-6")
@@ -225,7 +275,7 @@ String attrs = String.join(".",  x.attributes().asList().stream().map(Attribute:
 
 //								x.hasAttr("class") && ( x.attr("class").equals("row") )
 //div.col-md-6 > div.oes-box > h3.oes-box-title[@text^=Twitter] 
-							) {
+							) { // TWITTER
 System.err.println( "Twit cnt " + x.select("h3.oes-box-title:contains(Twitter)").size());
 // h3 class="oes-box-title">Twitter / cal_fire
 //								int tmpInt = PageObj.cnt;
@@ -238,32 +288,39 @@ System.err.println( "Twit cnt " + x.select("h3.oes-box-title:contains(Twitter)")
 								TwitterColumnTagCommand.cmd( 
 									PATH, x, x.select("h3.oes-box-title:contains(Twitter)").size()
 								);
-							}
+							} // END TWITTER
 								break;
 
 
 						case "table":
 
-							if( x.tagName().equals("table")
-//								&& x.hasClass("table")
-// div.oes-box > table.table.table-striped.news-list
-							) {
-//System.out.printf( "\n2 PageObj :: processPage TABLE  %s : .%s\n", x.tagName(), x.attributes());
+//							if( x.tagName().equals("table")
+////								&& x.hasClass("table")
+//// div.oes-box > table.table.table-striped.news-list
+//							) {
+////System.out.printf( "\n2 PageObj :: processPage TABLE  %s : .%s\n", x.tagName(), x.attributes());
+//
+								TableTagCommand.cmd(PATH, x, TableTagCommand.cnt++ );
+//							}
 
-								TableTagCommand.cmd(PATH, x, TableTagCommand.cnt );
-							}
+								break;
+
+						case "li":
+						case "script":
 
 								break;
 
 
 						case "p":
+						case "hr":
+						case "ul":
 
 /*
  * avoid node index increments with dissimlar tags; no need to differentiate 
  */
 // SUT
 									ParagraphTagCommand.cmd( 
-										PATH , x, ParagraphTagCommand.cnt);
+										PATH , x, ParagraphTagCommand.cnt++);
 
 									break;
 
@@ -303,15 +360,33 @@ System.err.println( "Twit cnt " + x.select("h3.oes-box-title:contains(Twitter)")
 							PageObj.cnt++;
 						}
 
+} catch (Exception e1) {
+
+
+	try {
+
+		Files.write(Paths.get("processing-errs.txt"), PATH.concat(" :: ").concat( e1.getMessage() ).getBytes() );
+	} catch (IOException e2) {
+
+		e2.printStackTrace();
+	}
+}
+
 					}); // end lamda elements loop 
 
 				} catch (Exception e1) {
 
+
+//					try {
+//					
+//						Files.write(Paths.get("processing-errs.txt"), PATH.concat(" :: ").concat( e1.getMessage() ).getBytes() );
+//					} catch (IOException e2) {
+//					
+//						e2.printStackTrace();
+//					}
 					e1.printStackTrace();
+
 				}
-////////////////
-//System.out.println( " PageObj :: processPage CONTENT FOUND " + e0.html());
-//System.out.println( " PageObj :: processPage CONTENT FOUND " + e0.size());
 
 			}
 // NEVER HERE
@@ -324,7 +399,7 @@ System.err.println( "Twit cnt " + x.select("h3.oes-box-title:contains(Twitter)")
 			break;
 		} // END  process page contexts
 
-		return result;
+//		return result;
 	}
 
 

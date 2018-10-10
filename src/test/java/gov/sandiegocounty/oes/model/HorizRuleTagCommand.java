@@ -12,94 +12,108 @@ import org.slf4j.LoggerFactory;
  * @author David Parker (dfparker@aemintegrators.com)
  *
  */
-public class ColumnTagCommand extends AbstractTagCommand implements ITagCommand {
+public class HorizRuleTagCommand extends AbstractTagCommand implements ITagCommand {
 
 
-	private static final Logger log = LoggerFactory.getLogger(ColumnTagCommand.class);
+	private static final Logger log = LoggerFactory.getLogger(HorizRuleTagCommand.class);
 
+	static int cnt = ParagraphTagCommand.cnt;
 
-	static int cnt = -1;
-
-	public ColumnTagCommand() {
+	public HorizRuleTagCommand() {
 	}//div.page-copy > table.table
 
 
 
 	/**
-	 * @param PATH. page path; e.g., /content/oes/en-us
+	 * @param PATH. page path; e.g., /content/oes/en-us/about
 	 * @param element. Superset of data in content panel
 	 * Usually page title are decorated with class=.art-PostHeader.. but not always
 	 * Other kinds of H* are page elements and not page headers
 	 */
 	static public void cmd(final String PATH, Element x, int node_seed_idx ) throws Exception {
 
+
 //		try {
 
 
-			final String COUNTER = ColumnTagCommand.cnt < 0 ? "" : Integer.toString(ColumnTagCommand.cnt);
+			final String COUNTER = HorizRuleTagCommand.cnt < 0 ? "" : Integer.toString(HorizRuleTagCommand.cnt);//Integer.toString(node_seed_idx)
+			
+			
+System.err.printf( " HorizRuleTagCommand :: cnt %s \n COUNTR %s", ParagraphTagCommand.cnt, COUNTER );
+
+
+/*
+ * Special case para-text instructions
+ */
 
 /* DO NORMAL TEXT PROCESSING
 
- * 1 create parsys; E.g.,http://192.168.200.87:4502/content/oes/en-us/test/jcr:content/oes-content/column-flex
+ * 1 create parsys; E.g.,http://192.168.200.87:4502/content/oes/en-us/test/jcr:content/oes-content/title
 {
-	"sling:resourceType":"oesshared/components/content/column-flex"
+	"sling:resourceType":"oes/components/content/text"
 }
  */
 
-/*System.out.printf( " ColumnTagCommand :: cmd  :: doStructureViaREST \n"
+/*
+ * assign node definition :: text property 
+ */
+
+/*
+ * NODE PATH + resourceType
+// 0.a sling:resourceType = nt:resource
+ * result: /content/ttc/en/jcr:content/content-column/sling:resourceType=foundation/components/parsys
+*/
+System.out.printf( " HorizRuleTagCommand :: cmd  :: doStructureViaREST \n"
 	+ "INPUT\n"
 	+ "- PATH %s\n"
 	+ "- ATTR_PATH %s\n"
 	+ "- data %s\n", 
 		PATH
-		, CONTENT_TILE_SEED.concat(TEXT)
+		, CONTENT_TILE_SEED.concat("HR")
 			.concat(COUNTER).concat("/")
 			.concat(PROP_BASE_TYPE)
 		, PROP_TEXT
 );
-*/
-/*
- * assign node definition :: column property 
- */
+
 			doStructureViaREST(
 				PATH
-				,CONTENT_TILE_SEED.concat(COLUMN)
+				,CONTENT_TILE_SEED.concat("HR")
 					.concat(COUNTER).concat("/")
 					.concat(PROP_BASE_TYPE)
-				, PROP_COLUMN
+				, PROP_TEXT
 			);
-
 /*
- * assign node definition :: textIsRich attribute
+ * assign node definition :: textIsRich attribute so hr renders correctly
  */
-
-			final int col_cnt = Integer.parseInt( x.attr("class"), 10);
-System.out.printf( " $$$$ col_cnt = %d", col_cnt );
-
-			String cols = "6,6";
-			if(col_cnt == 8) {
-				cols = "8,4";
-			} else if(col_cnt == 6) {
-				cols = "6,6";
-			} else if(col_cnt == 4) {
-				cols = "4,8";
-			} else if(col_cnt == 3) {
-				cols = "3,9";
-			}
 			doStructureViaREST(
 				PATH
-				,CONTENT_TILE_SEED.concat(COUNTER)
+				,CONTENT_TILE_SEED.concat("HR")
 					.concat(COUNTER).concat("/") 		// jcr:content/oes-content/text#/
-					.concat(PROP_NUM_COL)				// "num_col"
-				, cols
+					.concat(PROP_TEXTISRICH)			// "textIsRich"
+				, "true"
 			);
+
+
+/*
+ * 2 add content attributes; e.g., 
+ jcr:title = Articulos
+ */
+
+			doContentViaREST(
+				PATH
+				, CONTENT_TILE_SEED
+					.concat("HR")
+					.concat(COUNTER).concat("/")// jcr:content/oes-content/text#/
+					.concat( TEXT )				// jcr:content/oes-content/title/text=<CONTENT>
+				, x.selectFirst("hr")	// CONTENT
+			);
+
 
 
 //		} catch (Exception e1) {
 //
 //			e1.printStackTrace();
 //		}
-
 	}
 
 

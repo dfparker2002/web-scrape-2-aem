@@ -30,14 +30,15 @@ public class TableTagCommand extends AbstractTagCommand implements ITagCommand {
 	 * @param PATH. page path; e.g., /content/oes/en-us/updates
 	 * @param element. Superset of data in content panel
 	 */
-	static public void cmd(final String PATH, Element x, int node_seed_idx ) {
+	static public void cmd(final String PATH, Element x, int node_seed_idx ) throws Exception {
 
 
-		try {
+//		try {
+
 /*
  * Uniquify table in node structure
  */
-			final String COUNTER = TableTagCommand.cnt < 0 ? "" : Integer.toString( TableTagCommand.cnt++ );
+			final String COUNTER = TableTagCommand.cnt < 0 ? "" : Integer.toString( TableTagCommand.cnt );
 System.err.println( " :: cnt " + TableTagCommand.cnt );
 			/* DO NORMAL TEXT PROCESSING
 
@@ -75,10 +76,10 @@ System.err.println( " :: cnt " + TableTagCommand.cnt );
 			);
 
 
-	} catch (Exception e1) {
-
-			e1.printStackTrace();
-		}
+//		} catch (Exception e1) {
+//		
+//				e1.printStackTrace();
+//		}
 	}
 
 

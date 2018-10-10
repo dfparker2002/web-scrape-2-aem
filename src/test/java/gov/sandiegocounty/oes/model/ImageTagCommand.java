@@ -39,10 +39,10 @@ public class ImageTagCommand extends AbstractTagCommand implements ITagCommand {
 	 * Usually page title are decorated with class=.art-PostHeader.. but not always
 	 * Other kinds of H* are page elements and not page headers
 	 */
-	static public void cmd(final String PATH, Element x, int node_seed_idx ) {
+	static public void cmd(final String PATH, Element x, int node_seed_idx ) throws Exception {
 
+//		try {
 
-		try {
 
 			final String COUNTER = ImageTagCommand.cnt < 0 ? "" : Integer.toString(node_seed_idx);
 			ImageTagCommand.cnt++;
@@ -174,10 +174,10 @@ log.debug( " HeadTagCommand :: HeadTagCommand :: cmd (header version) : elem htm
 
 			}// end if check for page data
 
-		} catch (Exception e1) {
-
-			e1.printStackTrace();
-		}
+//		} catch (Exception e1) {
+//
+//			e1.printStackTrace();
+//		}
 	}
 
 

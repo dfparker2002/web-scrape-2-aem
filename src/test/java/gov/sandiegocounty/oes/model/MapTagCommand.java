@@ -39,17 +39,10 @@ public class MapTagCommand extends AbstractTagCommand implements ITagCommand {
 	 * Usually page title are decorated with class=.art-PostHeader.. but not always
 	 * Other kinds of H* are page elements and not page headers
 	 */
-	static public void cmd(final String PATH, Element x, int node_seed_idx ) {
+	static public void cmd(final String PATH, Element x, int node_seed_idx ) throws Exception {
 
+		final String COUNTER = MapTagCommand.cnt < 0 ? "" : Integer.toString(MapTagCommand.cnt );//Integer.toString(node_seed_idx)
 
-		try {
-
-			final String COUNTER = MapTagCommand.cnt < 0 ? "" : Integer.toString(node_seed_idx);
-			MapTagCommand.cnt++;
-/*
- * Non-page header / only a page element
- */
-			if (x.getElementsByAttributeValueMatching("class", "art-PostHeader").isEmpty()) {  // page data
 /* DO NORMAL TEXT PROCESSING
 
  * 1 create parsys; E.g.,http://192.168.200.87:4502/content/oes/en-us/test/jcr:content/oes-content/title
@@ -114,70 +107,11 @@ System.out.printf( " HeadTagCommand :: cmd  :: doStructureViaREST \n"
 			);
 
 
-// / "NORMAL" h* node
 
-
-			} else { // page title
-
-// page title /////............................
-//doContentViaREST(
-//		PATH
-//		, CONTENT_TILE_SEED
-//			.concat("text")
-//	.concat(COUNTER).concat("/")// jcr:content/oes-content/text#/
-//	.concat( TEXT )				// jcr:content/oes-content/title/text=<CONTENT>
-//	, x.selectFirst("h1,h2,h3,h4")	// CONTENT
-//);
-
-doStructureViaREST(
-		PATH
-		,PAGE_CONTENT_SEED.concat(TITLE)
-	, x.selectFirst("h1,h2,h3,h4").text()
-);
-
-///////////////////............................
-/*
- * 1 create parsys; E.g.,http://192.168.200.87:4502/content/oes/en-us/test/jcr:content/oes-content/title
-{
-	"sling:resourceType":"oes/components/content/title"
-}
- */
-System.out.println( " 2 HeadTagCommand :: HeadTagCommand :: cmd \n-TEST DATA " + new Element( TITLE ));
-
-			doStructureViaREST(
-				PATH
-				, CONTENT_TILE_SEED.concat("title/")	// jcr:content/oes-content/title/
-				.concat(PROP_BASE_TYPE)					// sling:resourceType
-			, PROP_OES_TITLE 							// oesshared/components/content/title  
-			);
-
-System.err.printf( " HeadTagCommand :: cmd PATH FILE \n%s\nattr path %s,\ncnt %d\n"
-	, PATH
-	, CONTENT_TILE_SEED.concat("title/" )
-	, node_seed_idx
-);
-
-
-/*
- * 2 add content attributes; e.g., 
- jcr:title = Articulos
- */
-log.debug( " HeadTagCommand :: HeadTagCommand :: cmd (header version) : elem html {}", x.selectFirst("h1,h2,h3,h4").html() );
-			doContentViaREST(
-				PATH					 		// /content/oes/es-us/about
-				, CONTENT_TILE_SEED
-					.concat("title")
-					.concat(COUNTER.concat("/"))
-					.concat( TITLE )			// jcr:content/oes-content/title/jcr:title=<CONTENT>
-				, x.selectFirst("h1,h2,h3,h4")	// CONTENT
-			);
-
-			}// end if check for page data
-
-		} catch (Exception e1) {
-
-			e1.printStackTrace();
-		}
+//		} catch (Exception e1) {
+//
+//			e1.printStackTrace();
+//		}
 	}
 
 

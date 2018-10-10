@@ -39,14 +39,14 @@ public class VideoTagCommand extends AbstractTagCommand implements ITagCommand {
 	 * @param PATH. page path; e.g., /content/oes/en-us/donations
 	 * @param element. Superset of data in content panel
 	 */
-	static public void cmd(final String PATH, Element x, int node_seed_idx ) {
+	static public void cmd(final String PATH, Element x, int node_seed_idx ) throws Exception {
 
 
-		try {
+//		try {
 /*
- * Uniquify table in node structure
+ * Uniquify video in node structure
  */
-			final String COUNTER = VideoTagCommand.cnt < 0 ? "" : Integer.toString( VideoTagCommand.cnt++ );
+			final String COUNTER = VideoTagCommand.cnt < 0 ? "" : Integer.toString( VideoTagCommand.cnt );
 System.err.println( " :: cnt " + VideoTagCommand.cnt );
 			/* DO NORMAL TEXT PROCESSING
 
@@ -55,11 +55,11 @@ System.err.println( " :: cnt " + VideoTagCommand.cnt );
 	"sling:resourceType":"oes/components/content/text"
 }
  */
-			//sling:resourceType=foundation/components/table
-			//tableData=<data>
+			//sling:resourceType=foundation/components/video
+			//videoid=<data>
 
 /*
- * assign sling:resourceType node definition :: foundation table 
+ * assign sling:resourceType node definition :: foundation  
  */
 
 		doStructureViaREST(
@@ -100,7 +100,7 @@ System.err.println( " :: cnt " + VideoTagCommand.cnt );
 
 /*
  * 2 add content attributes; e.g., 
- *  	sling:resourceType=foundation/components/video
+ *  	sling:resourceType=oesshared/components/content/youtube
  *  	width=560
  *  	height"315
  *  	videoid=12cNBNKIXv8
@@ -108,10 +108,10 @@ System.err.println( " :: cnt " + VideoTagCommand.cnt );
 
 
 
-	} catch (Exception e1) {
-
-			e1.printStackTrace();
-		}
+//	} catch (Exception e1) {
+//
+//			e1.printStackTrace();
+//		}
 	}
 
 

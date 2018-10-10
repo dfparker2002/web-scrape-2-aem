@@ -40,16 +40,17 @@ public class ParagraphTagCommand extends AbstractTagCommand implements ITagComma
 	 * Usually page title are decorated with class=.art-PostHeader.. but not always
 	 * Other kinds of H* are page elements and not page headers
 	 */
-	static public void cmd(final String PATH, Element x, int node_seed_idx ) {
+	static public void cmd(final String PATH, Element x, int node_seed_idx ) throws Exception {
 
 
-		try {
+//		try {
+
 
 if( !StringUtils.isEmpty(x.html() ) ) { // end check empty para constructions
 /*
  * Uniquify paragraph in node structure
  */
-			final String COUNTER = ParagraphTagCommand.cnt < 0 ? "" : Integer.toString(ParagraphTagCommand.cnt++);
+			final String COUNTER = ParagraphTagCommand.cnt < 0 ? "" : Integer.toString(ParagraphTagCommand.cnt);
 System.err.println( " ParagraphTagCommand :: cnt " + ParagraphTagCommand.cnt );
 
 			/* DO NORMAL TEXT PROCESSING
@@ -119,10 +120,10 @@ System.out.printf( " ParagraphTagCommand :: cmd  :: doStructureViaREST \n"
 
 } // end check empty para constructions
 
-		} catch (Exception e1) {
-
-			e1.printStackTrace();
-		}
+//		} catch (Exception e1) {
+//
+//			e1.printStackTrace();
+//		}
 	}
 
 
