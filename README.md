@@ -1,3 +1,11 @@
+# Instructions
+Run JSoupParseOES
+~line 107 to limit pages processed 
+add page to constraint
+E.g., 
+ x.endsWith("active-shooter-at-san-diego-rockn-roll-marathon-060318-1325\\index.html") // testing
+ 
+ 
 # web-scrape-2-aem
 parse local web data to local aem node structure. Auto-didactic lessons on web page parsing, screen scraping, Java-REST HTTP transaction and data structures
 
