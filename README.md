@@ -31,5 +31,3 @@ curl -u admin:admin "http://localhost:4502/$CONTENTPATH" \
  -F "jcr:content/jcr:primaryType=nt:unstructured"
 
 sleep 1
-
-done
