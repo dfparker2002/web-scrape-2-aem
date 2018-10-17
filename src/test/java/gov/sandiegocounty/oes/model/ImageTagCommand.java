@@ -3,18 +3,9 @@
  */
 package gov.sandiegocounty.oes.model;
 
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import gov.sandiegocounty.util.HttpURLConnectionRunner;
 
 
 /**
@@ -41,11 +32,9 @@ public class ImageTagCommand extends AbstractTagCommand implements ITagCommand {
 	 */
 	static public void cmd(final String PATH, Element x, int node_seed_idx ) throws Exception {
 
-//		try {
+			final String COUNTER = ImageTagCommand.cnt < 0 ? "" : Integer.toString( ImageTagCommand.cnt);
+System.err.println( " :: cnt " + ImageTagCommand.cnt );
 
-
-			final String COUNTER = ImageTagCommand.cnt < 0 ? "" : Integer.toString(node_seed_idx);
-			ImageTagCommand.cnt++;
 /*
  * Non-page header / only a page element
  */

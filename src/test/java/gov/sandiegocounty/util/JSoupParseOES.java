@@ -52,7 +52,15 @@ public class JSoupParseOES {
 	private static final Logger log = LoggerFactory.getLogger(JSoupParseOES.class);
 
 //	final static String OES_DATA_SRC = "C:\\xampp\\htdocs\\www.sdcountyemergency.com";
-	final static String OES_DATA_SRC = "C:\\Users\\User\\workspace\\oesshared\\website\\www.sdcountyemergency.com";
+//	NORMAL
+//	final static String OES_DATA_SRC = "C:\\Users\\User\\workspace\\oesshared\\website\\www.sdcountyemergency.com";
+//	UPDATES ONLY
+//	final static String OES_DATA_SRC = "C:\\Users\\User\\workspace\\oesshared\\website\\www.sdcountyemergency.com\\en-us\\updates";
+	final static String OES_DATA_SRC = "C:\\Users\\User\\workspace\\oesshared\\website\\www.sdcountyemergency.com\\updates";
+//	ONE UPDATE ONLY
+//	final static String OES_DATA_SRC = "C:\\Users\\User\\workspace\\oesshared\\website\\www.sdcountyemergency.com\\updates\\active-shooter-at-san-diego-rockn-roll-marathon-060318-1325";
+//	final static String OES_DATA_SRC = "C:\\Users\\User\\workspace\\oesshared\\website\\www.sdcountyemergency.com\\updates\\lilac-fire-update-120917-2329";
+	
 	static int elem_cnt = 0;
 
 	/**
@@ -73,7 +81,7 @@ public class JSoupParseOES {
 			//https://stackoverflow.com/questions/13777336/how-to-append-an-exceptions-stacktrace-into-a-file-in-java
 
 
-			Path path = Paths.get(OES_DATA_SRC);
+			Path path = Paths.get( OES_DATA_SRC );
 			final List<Path> files = new ArrayList<>();
 
 			Files.walkFileTree(path,
@@ -107,6 +115,7 @@ public class JSoupParseOES {
 if( 
 	!x.endsWith("es-us\\index.html")
 	&& !x.endsWith("en-us\\index.html")
+	&& x.toFile().getPath().contains("updates")
 //	&& x.endsWith("donations\\index.html") // testing
 //	&& x.endsWith("active-shooter-at-san-diego-rockn-roll-marathon-060318-1325\\index.html") // testing
 ) {
@@ -152,9 +161,10 @@ System.out.printf( " <<< "
 );
 
 
-			page.processPage(
-				x.toFile(), e.getAllElements()
-			);
+					page.processPage(
+						x.toFile(), e.getAllElements()
+					);
+
 
 //			} catch (IOException e1) {
 //
@@ -182,12 +192,13 @@ cnt++;
 
 			    try(Writer w = new FileWriter( "processing-errs.txt", true)) {
 
-
-Files.write( Paths.get("processing-errs.txt"), x.toFile().getPath().concat(" :: ").concat( e.getMessage() ).getBytes() );
+System.out.println( " JSoupParseOES :: main " + e.getMessage() );
+System.out.println( " JSoupParseOES :: main " + ( null == Paths.get("processing-errs.txt")) );
+Files.write( Paths.get("processing-errs.txt"), "".concat(" :: ").concat( e.getMessage() ).getBytes() );
 //	x.toAbsolutePath().concat(" :: ").concat( 
 //	e.getMessage().getBytes();
 e.printStackTrace(new PrintWriter(new BufferedWriter(w)));
-log.error( " :: path {} : err {}", x.toFile().getPath(), e.getMessage() );
+log.error( " :: err {}", e.getMessage() );
 
 			    } catch (IOException e1) {
 

@@ -6,8 +6,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -87,8 +90,11 @@ System.out.printf( "\n1 HttpURLConnectionRunner :: execPost \n"
 				StandardCharsets.ISO_8859_1.toString()
 //				StandardCharsets.UTF_8.toString()
 			);
+
+
 //System.err.println( e.html().substring(0, 25));
 			multipart.addFormField( tgt_internal_page_path, e.outerHtml() );
+
 
 // Send post request
 			List<String> response = multipart.finish();
@@ -97,8 +103,80 @@ log.debug( " HttpURLConnectionRunner :: execPost \n{}", String.join("\n** ", res
 ///////////////
 
 	}
-
+	
 /////////////////
+//HTTP POST structure data request
+/**
+* For use with non-standard (text) data
+* E.g., 
+* ./datetime: 2018-10-13T09:34:00.000-07:00
+* ./datetime@TypeHint: Date
+* 
+* @param data
+* @param tgt_node node path						; e.g., /content/oes/en-us/test
+* @param tgt_internal_page_path content/attr path	; e.g., jcr:content/oes-content/text/text
+* @throws Exception
+*/
+	static public void execPostComplexData(final String tgt_node
+		, final String tgt_internal_page_path
+		, final Map<String, String> data) throws Exception {
+
+//OK
+log.debug("INPUT \nnode {}\nattr path {}", tgt_node, tgt_internal_page_path);
+
+System.out.printf(
+ "======================\n2 HttpURLConnectionRunner :: execPostStructure \n" + "INPUT\n" +
+ "- node %s\n" + "- attr %s\n" + "- data %s\n==============", tgt_node
+ ,tgt_internal_page_path , data
+);
+
+
+//Send post request
+/*
+* Build seed config
+*/
+		URL obj = new URL(String.format(OES_HOME, tgt_node));
+		System.err.println(" HttpURLConnectionRunner :: execPostStructure TARGET NODE: " + obj.toString());
+
+/*
+* Open URL connection
+*/
+		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+		synchronized (con) {
+
+///////////////
+/// * This is to add file content */
+			MultipartUtility multipart = new MultipartUtility(obj.toString(), StandardCharsets.ISO_8859_1.toString());
+
+//iterate data
+			Iterator<Entry<String, String>> itr =  data.entrySet().iterator();
+			while(itr.hasNext()){
+
+				Map.Entry<String, String> entry = itr.next();
+/*
+* E.g., 
+* ./datetime: 2018-10-13T09:34:00.000-07:00
+* ./datetime@TypeHint: Date
+*/
+System.out.println("TEST :: Key is " + entry.getKey() + " Value is " + entry.getValue());
+if(entry.getKey().equals("datetime")) {
+	final Calendar c = JavaCalendarConverter.stringToSimpleDate( entry.getValue(), JavaCalendarConverter.asp_pattern);
+System.out.println( " HttpURLConnectionRunner :: execPostComplexData " + c);
+}
+//System.out.println( " JavaCalendarConverter :: main " + JavaCalendarConverter.calendarToString(c, pattern));
+
+			multipart.addFormField(tgt_internal_page_path.concat(entry.getKey()), entry.getValue());
+			
+			}
+			List<String> response = multipart.finish();
+///////////////
+//System.out.println( " HttpURLConnectionRunner ::
+/////////////// execPostStructure " +
+log.debug(" HttpURLConnectionRunner :: execPost \n{}", String.join("\n** ", response));
+		}
+	}
+/////////////////
+	
 // HTTP POST structure data request
 	/**
 	 * @param data
@@ -141,10 +219,11 @@ System.err.println( " HttpURLConnectionRunner :: execPostStructure TARGET NODE: 
 /// * This is to add file content */
 		MultipartUtility multipart = new MultipartUtility( 
 			obj.toString(),
-			StandardCharsets.UTF_8.toString()
+			StandardCharsets.ISO_8859_1.toString()
 		);
 
 		multipart.addFormField( tgt_internal_page_path, StringUtils.chomp( data ));
+System.out.println( " *** HttpURLConnectionRunner :: execPostStructure " + data);
 		List<String> response = multipart.finish();
 ///////////////
 //System.out.println( " HttpURLConnectionRunner :: execPostStructure " + 
@@ -182,6 +261,7 @@ log.debug( " :: addCookie {} = {}", key , val );
             }               
         }
 	}
+
 
 	/**
 	 * @param args
