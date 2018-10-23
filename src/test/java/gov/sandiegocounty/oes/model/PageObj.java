@@ -100,13 +100,9 @@ public class PageObj {
 //		parsePathParticle(file)
 //);
 
-//		String result = null;
 		final String PATH = parsePathParticle(file);
 
-
 //System.out.printf( " \n0 PageObj :: processPage : \n> PATH %s\n> element size %d\n", PATH, e.size() );
-
-
 //		List<String> specialNodes = Arrays.asList(new String[]
 //			{"div.art-PostHeader","div.map-instructions"
 //			,"div.xrm-attribute-value"	// remove,  div.art-PostHeader here
@@ -117,13 +113,19 @@ public class PageObj {
 //		);
 
 		final String file_parent = file.getParentFile().getName() ;
+
 		final String file_parent_parent = file.getParentFile().getParentFile().getName() ;
 		final int count = file.getPath().split("\\\\").length;
 
+System.out.printf( "\n.....\n PageObj :: 2 processPage PATH %s, file_parent_path %s, file %s\n...."
+		, PATH
+		, file_parent
+		, file.getName()
+);
 
 //C:\Users\User\workspace\oesshared\website\www.sdcountyemergency.com\es-us\index.html
-//		switch (file_parent_parent) { // process page contexts
-		switch (file_parent) { // process updates contexts
+//		switch (file_parent) { // process page contexts
+		switch (file_parent_parent) { // process updates contexts
 
 
 			case "www.sdcountyemergency.com":
@@ -131,14 +133,14 @@ public class PageObj {
 			case "es-us": // es home
 // homes
 
-
 //			result = "home";
-System.out.println(" \nPageObj :: processPage HOME");
 
 				break;
 
 			case "updates":
-//			case "lilac-fire-update-120917-2329":
+
+
+System.out.println(" \nPageObj :: processPage HOME");
 
 /*
  * :: Special case ::
