@@ -55,8 +55,11 @@ public class JSoupParseOES {
 //	NORMAL
 //	final static String OES_DATA_SRC = "C:\\Users\\User\\workspace\\oesshared\\website\\www.sdcountyemergency.com";
 //	UPDATES ONLY
-//	final static String OES_DATA_SRC = "C:\\Users\\User\\workspace\\oesshared\\website\\www.sdcountyemergency.com\\en-us\\updates";
-	final static String OES_DATA_SRC = "C:\\Users\\User\\workspace\\oesshared\\website\\www.sdcountyemergency.com\\updates";
+//	final static String OES_DATA_SRC = "C:\\Users\\User\\workspace\\oesshared\\website\\www.sdcountyemergency.com\\updates";
+//	final static String OES_DATA_SRC = "C:\\Users\\User\\workspace\\oesshared\\website\\www.sdcountyemergency.com\\es-us\\updates\\52-magntiude-earthquake-felt-in-san-diego-county-061016-0135";
+	final static String OES_DATA_SRC = "C:\\Users\\User\\workspace\\oesshared\\website\\www.sdcountyemergency.com\\es-us\\updates";
+//	final static String OES_DATA_SRC = "C:\\Users\\User\\workspace\\oesshared\\website\\www.sdcountyemergency.com\\updates\\3.6-earthquake-hits-san-diego-county";
+//	final static String OES_DATA_SRC = "C:\\Users\\User\\workspace\\oesshared\\website\\www.sdcountyemergency.com\\updates\\alertsandiego-evacuation-order-issued-to-an-additional-3500-contacts-120717-1919";
 //	ONE UPDATE ONLY
 //	final static String OES_DATA_SRC = "C:\\Users\\User\\workspace\\oesshared\\website\\www.sdcountyemergency.com\\updates\\active-shooter-at-san-diego-rockn-roll-marathon-060318-1325";
 //	final static String OES_DATA_SRC = "C:\\Users\\User\\workspace\\oesshared\\website\\www.sdcountyemergency.com\\updates\\lilac-fire-update-120917-2329";
@@ -116,6 +119,7 @@ if(
 	!x.endsWith("es-us\\index.html")
 	&& !x.endsWith("en-us\\index.html")
 	&& x.toFile().getPath().contains("updates")
+
 //	&& x.endsWith("donations\\index.html") // testing
 //	&& x.endsWith("active-shooter-at-san-diego-rockn-roll-marathon-060318-1325\\index.html") // testing
 ) {

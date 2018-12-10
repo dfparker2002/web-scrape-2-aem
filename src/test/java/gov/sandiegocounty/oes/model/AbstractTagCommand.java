@@ -62,7 +62,6 @@ public class AbstractTagCommand {
 	final static String PROP_IPARSYS = 		"foundation/components/iparsys";
 	final static String PROP_INCIDENT_ITEM ="oesshared/components/content/incident-item";
 
-
 ///**
 // * 
 // * Persist content & content attributes into node path

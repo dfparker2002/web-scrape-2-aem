@@ -4,8 +4,13 @@
 package gov.sandiegocounty.oes.model;
 
 import java.text.ParseException;
+import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
 import org.slf4j.Logger;
@@ -42,11 +47,17 @@ System.err.println( " :: cnt " + IncidentComponentCommand.cnt );
 
 ///////////////////............................
 //datetime
-				Element datetime = x.select("div.col-sm-12").get(1); // 2nd position value; extract text 
-				Element asl_link = x.select("a").last();
+				final Element datetime = x.select("div.col-sm-12").get(1); // 2nd position value; extract text
+				final Element asl_link = getStringFromElement( x, "div.asl_link").get();
 
 ////////////
-Elements remainder = x.getAllElements().select("div.page-copy").first().getElementsByAttributeValue("class", "xrm-attribute-value");
+				Elements remainder = x.getAllElements().select("div.page-copy").first().getElementsByAttributeValue("class", "xrm-attribute-value");//.not("");
+
+///////////
+// remove scripts
+				remainder.select("div.addthis_toolbox").next().remove();
+				remainder.select("div.addthis_toolbox").remove();
+//////////
 
 // build nested nodes
 				doNodesCreation(PATH, remainder );
@@ -67,7 +78,7 @@ System.out.println( " IncidentComponentCommand :: cmd datetime " + datetime);
 					, CONTENT_TILE_SEED
 						.concat(INCIDENT_ITEM)
 						.concat("/").concat("asl-link")		// jcr:content/oes-content/asl-link=<CONTENT>
-					, asl_link.attr("href")
+					, asl_link.select("a").attr("href")
 				);
 /*
  * REMOVE SCRIPT in TEXT?  
@@ -200,18 +211,57 @@ log.debug("Make title {}", x.text());
 
 
 /*
+ * red-flag-warning-extended-through-to-wednesday-11-14-at-5-00pm-111218-1100
  * 2 add content attributes; e.g., 
  p = Articulos ...
  */
+		Document n = Jsoup.parse(ee.html());
+		removeComments(n);
+System.out.println( " >>>> IncidentComponentCommand :: doNodesCreation " + n.select("body").first().html());
 		doStructureViaREST(
 			PATH
 			, CONTENT_TILE_SEED
 			.concat(INCIDENT_ITEM).concat("/")
 			.concat("emergency-message-copy")
-			, ee.html()
+			, n.select("body").first().html()
 		);
 
 	}
+
+    /**
+     * @param node
+     */
+    private static void removeComments(Node node) {
+
+    	for (int i = 0; i < node.childNodes().size();) { 
+            Node child = node.childNode(i);
+
+            if (child.nodeName().equals("#comment")) {
+System.out.println( " <<< IncidentComponentCommand :: removeComments : removing " + child.outerHtml() );
+                child.remove(); 
+            }else { 
+                removeComments(child); 
+                i++; 
+            } 
+        } 
+    }
+
+    private static Optional<Element> getStringFromElement(Element nodeContent, String selector) {
+        try {
+
+        	if(StringUtils.isEmpty(selector)) {
+
+        		return Optional.of(nodeContent);
+        	} else {
+
+        		return Optional.of(nodeContent.select(selector).first());
+        	}
+
+        } catch (Exception e) {
+        	log.error(" Could not extract ASL LINK from HTML", e);
+        }
+        return Optional.empty();
+    }
 }
 /*
 /content/oes/
